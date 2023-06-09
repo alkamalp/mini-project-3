@@ -1,0 +1,21 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8081:8081
+    # volumes:
+    #   - .:/app
+    depends_on:
+      - db
+  db:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=kamal-baru
+      - MYSQL_DATABASE=kamal-db
+    volumes:
+      - db-data:/var/lib/mysql
+volumes:
+  db-data:

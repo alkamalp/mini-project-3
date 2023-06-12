@@ -18,7 +18,7 @@ func NewActor(dbCrud *gorm.DB) Actor {
 type ActorInterfaceRepo interface {
 	CreateActor(actor *entity.Actor) (*entity.Actor, error)
 	GetActorById(id uint) (entity.Actor, error)
-	UpdateActor(actor *entity.Actor, id uint) (any, error)
+	UpdateActor(actor *entity.Actor, id uint) (*entity.Actor, error)
 	DeleteActor(username string) (any, error)
 	LoginActor(actor *entity.Actor) (*entity.Actor, error)
 }
@@ -37,7 +37,7 @@ func (repo Actor) GetActorById(id uint) (entity.Actor, error) {
 }
 
 // UpdateActor multiple fields
-func (repo Actor) UpdateActor(actor *entity.Actor, id uint) (any, error) {
+func (repo Actor) UpdateActor(actor *entity.Actor, id uint) (*entity.Actor, error) {
 	err := repo.db.Model(&entity.Actor{}).Where("id = ?", id).
 		Updates(actor).Error
 	return nil, err

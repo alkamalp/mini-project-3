@@ -11,7 +11,7 @@ import (
 type UseCaseActor interface {
 	CreateActor(actor ActorParam) (entity.Actor, error)
 	GetActorById(id uint) (entity.Actor, error)
-	UpdateActor(actor ActorParam, id uint) (any, error)
+	UpdateActor(actor ActorParam, id uint) (*entity.Actor, error)
 	DeleteActor(username string) (any, error)
 	LoginActor(actor ActorParam) (entity.Actor, error)
 }
@@ -52,7 +52,7 @@ func (uc useCaseActor) GetActorById(id uint) (entity.Actor, error) {
 	return actor, err
 }
 
-func (uc useCaseActor) UpdateActor(actor ActorParam, id uint) (any, error) {
+func (uc useCaseActor) UpdateActor(actor ActorParam, id uint) (*entity.Actor, error) {
 	var editActor *entity.Actor
 	editActor = &entity.Actor{
 		Username: actor.Username,
@@ -64,9 +64,9 @@ func (uc useCaseActor) UpdateActor(actor ActorParam, id uint) (any, error) {
 
 	_, err := uc.actorRepo.UpdateActor(editActor, id)
 	if err != nil {
-		return *editActor, err
+		return editActor, err
 	}
-	return *editActor, nil
+	return editActor, nil
 }
 
 func (uc useCaseActor) DeleteActor(username string) (any, error) {

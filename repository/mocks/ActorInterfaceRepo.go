@@ -115,29 +115,20 @@ func (_m *ActorInterfaceRepo) LoginActor(actor *entity.Actor) (*entity.Actor, er
 }
 
 // UpdateActor provides a mock function with given fields: actor, id
-func (_m *ActorInterfaceRepo) UpdateActor(actor *entity.Actor, id uint) (interface{}, error) {
+func (_m *ActorInterfaceRepo) UpdateActor(actor *entity.Actor, id uint) (*entity.Actor, error) {
 	ret := _m.Called(actor, id)
 
-	var r0 interface{}
-	var r1 error
-	if rf, ok := ret.Get(0).(func(*entity.Actor, uint) (interface{}, error)); ok {
+	if rf, ok := ret.Get(0).(func(*entity.Actor, uint) (*entity.Actor, error)); ok {
 		return rf(actor, id)
 	}
-	if rf, ok := ret.Get(0).(func(*entity.Actor, uint) interface{}); ok {
-		r0 = rf(actor, id)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(interface{})
-		}
+
+	if ret.Get(0) != nil {
+		r0 := ret.Get(0).(*entity.Actor)
+		r1 := ret.Error(1)
+		return r0, r1
 	}
 
-	if rf, ok := ret.Get(1).(func(*entity.Actor, uint) error); ok {
-		r1 = rf(actor, id)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return nil, ret.Error(1)
 }
 
 type mockConstructorTestingTNewActorInterfaceRepo interface {

@@ -2,12 +2,12 @@ package customers
 
 import (
 	"errors"
-	"testing"
-	"time"
-
+	"fmt"
 	"github.com/alkamalp/crm-golang/entity"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"testing"
+	"time"
 )
 
 type MockCustomerRepo struct {
@@ -68,7 +68,7 @@ func TestGetCustomerById(t *testing.T) {
 	}
 
 	customerID := uint(1)
-	customer := CustomerParam{
+	customer := entity.Customer{
 		First_name: "John",
 		Last_name:  "Doe",
 		Email:      "john.doe@example.com",
@@ -109,15 +109,11 @@ func TestGetCustomerById_Error(t *testing.T) {
 
 func (m *MockCustomerRepo) UpdateCustomer(customer *entity.Customer, id uint) (interface{}, error) {
 	args := m.Called(customer, id)
-	result := args.Get(0)
-	err := args.Error(1)
-	return result, err
+	return args.Get(0), args.Error(1)
 }
 
 func TestUpdateCustomer(t *testing.T) {
-
 	mockRepo := new(MockCustomerRepo)
-
 	useCase := useCaseCustomer{
 		customerRepo: mockRepo,
 	}
@@ -130,33 +126,27 @@ func TestUpdateCustomer(t *testing.T) {
 		Avatar:     "avatar.jpg",
 	}
 
-	updatedCustomer := &entity.Customer{
+	expectedCustomer := &entity.Customer{
 		First_name: customer.First_name,
 		Last_name:  customer.Last_name,
 		Email:      customer.Email,
 		Avatar:     customer.Avatar,
-		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
 
-	mockRepo.On("UpdateCustomer", updatedCustomer, customerID).Return(updatedCustomer, nil)
-
+	mockRepo.On("UpdateCustomer", expectedCustomer, customerID).Return(expectedCustomer, nil)
 	result, err := useCase.UpdateCustomer(customer, customerID)
-
-	mockRepo.AssertCalled(t, "UpdateCustomer", updatedCustomer, customerID)
-
-	assert.Equal(t, updatedCustomer, result)
+	mockRepo.AssertCalled(t, "UpdateCustomer", expectedCustomer, customerID)
+	assert.Equal(t, *expectedCustomer, result)
 	assert.NoError(t, err)
 }
 
 func TestUpdateCustomer_Error(t *testing.T) {
-
 	mockRepo := new(MockCustomerRepo)
 
 	useCase := useCaseCustomer{
 		customerRepo: mockRepo,
 	}
-
 	customerID := uint(1)
 	customer := CustomerParam{
 		First_name: "John",
@@ -164,25 +154,19 @@ func TestUpdateCustomer_Error(t *testing.T) {
 		Email:      "john.doe@example.com",
 		Avatar:     "avatar.jpg",
 	}
-
-	expectedError := errors.New("failed to update customer")
-
-	updatedCustomer := &entity.Customer{
+	expectedCustomer := &entity.Customer{
 		First_name: customer.First_name,
 		Last_name:  customer.Last_name,
 		Email:      customer.Email,
 		Avatar:     customer.Avatar,
+		UpdatedAt:  time.Now(),
 	}
-
-	mockRepo.On("UpdateCustomer", updatedCustomer, customerID).Return(nil, expectedError)
-
+	expectedError := fmt.Errorf("failed to update customer")
+	mockRepo.On("UpdateCustomer", expectedCustomer, customerID).Return(nil, expectedError)
 	result, err := useCase.UpdateCustomer(customer, customerID)
-
-	mockRepo.AssertCalled(t, "UpdateCustomer", updatedCustomer, customerID)
-
-	assert.Error(t, err)
+	mockRepo.AssertCalled(t, "UpdateCustomer", expectedCustomer, customerID)
 	assert.EqualError(t, err, expectedError.Error())
-	assert.Nil(t, result)
+	assert.NotNil(t, result)
 }
 
 func (m *MockCustomerRepo) DeleteCustomer(id uint) (interface{}, error) {

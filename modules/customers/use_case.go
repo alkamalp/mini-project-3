@@ -1,5 +1,4 @@
 package customers
-
 import (
 	"time"
 
